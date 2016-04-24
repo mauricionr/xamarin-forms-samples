@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using CoreGraphics;
 using EffectsDemo.iOS;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
-[assembly:ResolutionGroupName ("MyCompany")]
+[assembly:ResolutionGroupName ("Xamarin")]
 [assembly:ExportEffect (typeof(LabelShadowEffect), "LabelShadowEffect")]
 namespace EffectsDemo.iOS
 {
@@ -13,10 +14,13 @@ namespace EffectsDemo.iOS
 		protected override void OnAttached ()
 		{
 			try {
-				Control.Layer.CornerRadius = (nfloat)ShadowEffect.GetRadius (Element);
-				Control.Layer.ShadowColor = ShadowEffect.GetColor (Element).ToCGColor ();
-				Control.Layer.ShadowOffset = new CGSize ((double)ShadowEffect.GetDistanceX (Element), (double)ShadowEffect.GetDistanceY (Element));
-				Control.Layer.ShadowOpacity = 1.0f;
+				var effect = (ShadowEffect)Element.Effects.FirstOrDefault (e => e is ShadowEffect);
+				if (effect != null) {
+					Control.Layer.CornerRadius = effect.Radius;
+					Control.Layer.ShadowColor = effect.Color.ToCGColor ();
+					Control.Layer.ShadowOffset = new CGSize (effect.DistanceX, effect.DistanceY);
+					Control.Layer.ShadowOpacity = 1.0f;
+				}
 			} catch (Exception ex) {
 				Console.WriteLine ("Cannot set property on attached control. Error: ", ex.Message);
 			}

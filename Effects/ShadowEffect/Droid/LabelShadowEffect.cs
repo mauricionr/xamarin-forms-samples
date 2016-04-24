@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using EffectsDemo;
 using EffectsDemo.Droid;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
-[assembly:ResolutionGroupName ("MyCompany")]
+[assembly:ResolutionGroupName ("Xamarin")]
 [assembly:ExportEffect (typeof(LabelShadowEffect), "LabelShadowEffect")]
 namespace EffectsDemo.Droid
 {
@@ -14,11 +15,14 @@ namespace EffectsDemo.Droid
 		{
 			try {
 				var control = Control as Android.Widget.TextView;
-				float radius = (float)ShadowEffect.GetRadius (Element);
-				float distanceX = (float)ShadowEffect.GetDistanceX (Element);
-				float distanceY = (float)ShadowEffect.GetDistanceY (Element);
-				Android.Graphics.Color color = ShadowEffect.GetColor (Element).ToAndroid ();
-				control.SetShadowLayer (radius, distanceX, distanceY, color);
+				var effect = (ShadowEffect)Element.Effects.FirstOrDefault (e => e is ShadowEffect);
+				if (effect != null) {
+					float radius = effect.Radius;
+					float distanceX = effect.DistanceX;
+					float distanceY = effect.DistanceY;
+					Android.Graphics.Color color = effect.Color.ToAndroid ();
+					control.SetShadowLayer (radius, distanceX, distanceY, color);
+				}
 			} catch (Exception ex) {
 				Console.WriteLine ("Cannot set property on attached control. Error: ", ex.Message);
 			}

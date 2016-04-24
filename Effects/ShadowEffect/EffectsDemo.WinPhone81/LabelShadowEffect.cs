@@ -3,8 +3,9 @@ using System;
 using System.Diagnostics;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.WinRT;
+using System.Linq;
 
-[assembly: ResolutionGroupName ("MyCompany")]
+[assembly: ResolutionGroupName ("Xamarin")]
 [assembly: ExportEffect (typeof(LabelShadowEffect), "LabelShadowEffect")]
 namespace EffectsDemo.WinPhone81
 {
@@ -16,19 +17,22 @@ namespace EffectsDemo.WinPhone81
 		{
 			try {
 				if (!shadowAdded) {
-					var textBlock = Control as Windows.UI.Xaml.Controls.TextBlock;
+                    var effect = (ShadowEffect)Element.Effects.FirstOrDefault(e => e is ShadowEffect);
+                    if (effect != null)
+                    {
+                        var textBlock = Control as Windows.UI.Xaml.Controls.TextBlock;
+                        var shadowLabel = new Label();
+                        shadowLabel.Text = textBlock.Text;
+                        shadowLabel.FontAttributes = FontAttributes.Bold;
+                        shadowLabel.HorizontalOptions = LayoutOptions.Center;
+                        shadowLabel.VerticalOptions = LayoutOptions.CenterAndExpand;
+                        shadowLabel.TextColor = effect.Color;
+                        shadowLabel.TranslationX = effect.DistanceX;
+                        shadowLabel.TranslationY = effect.DistanceY;
 
-					var shadowLabel = new Label ();
-					shadowLabel.Text = textBlock.Text;
-					shadowLabel.FontAttributes = FontAttributes.Bold;
-					shadowLabel.HorizontalOptions = LayoutOptions.Center;
-					shadowLabel.VerticalOptions = LayoutOptions.CenterAndExpand;
-					shadowLabel.TextColor = ShadowEffect.GetColor (Element);
-					shadowLabel.TranslationX = ShadowEffect.GetDistanceX (Element);
-					shadowLabel.TranslationY = ShadowEffect.GetDistanceY (Element);
-
-					((Grid)Element.Parent).Children.Insert (0, shadowLabel);
-					shadowAdded = true;
+                        ((Grid)Element.Parent).Children.Insert(0, shadowLabel);
+                        shadowAdded = true;
+                    }
 				}
 			} catch (Exception ex) {
 				Debug.WriteLine ("Cannot set property on attached control. Error: ", ex.Message);
